@@ -1,4 +1,4 @@
-package com.hk.common.base.config;
+package com.xbd.svc.common.config;
 
 import java.io.IOException;
 
