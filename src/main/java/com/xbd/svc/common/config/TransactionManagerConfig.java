@@ -19,6 +19,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 /**
  * AOP配置全局事物,有了此配置service包下的方法不需要用事物注解
+ * @author administrator
  *
  */
 @Configuration

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 /**
  * @author zzq
  */
-@Service("snowflakeIdWorkerGenerator")
+//@Service("snowflakeIdWorkerGenerator")
 public class SnowflakeIdWorkerGenerator implements IdGenerator {
 
     /** 开始时间截 (2015-01-01) */
