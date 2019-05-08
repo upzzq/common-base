@@ -1,33 +1,41 @@
 package com.xbd.svc.common.handle;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Enumeration;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.alibaba.fastjson.JSON;
+import com.xbd.svc.common.properties.RequestProperties;
+import com.xbd.svc.common.utils.IpAddrUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
-import lombok.extern.slf4j.Slf4j;
-import springfox.documentation.spring.web.json.Json;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 @Slf4j
 @Aspect
 @Component
 public class RequestLogHandle {
-	
+
+	@Autowired
+	private RequestProperties requestProperties;
+
+	/**
+	 * 日志记录拦截的切面表达式
+	 */
 	private final String pointcut = "execution(public * com.xbd.svc.*.controller..*(..))";
-	
+
+	/**
+	 * 单次请求超过多少时间认为该请求执行缓慢(ms)
+	 */
+	private final static int SLOW_REQUEST_TIME = 1000;
+
+
 	ThreadLocal<Long> startTime = new ThreadLocal<>();
 
 	@Pointcut(pointcut)
@@ -37,7 +45,6 @@ public class RequestLogHandle {
 	
 	@Before("log()")
 	public void doBefore(JoinPoint joinPoint) {
-		
         if (log.isDebugEnabled()) {
         	startTime.set(System.currentTimeMillis());
         	printRequestInfo(joinPoint);
@@ -50,7 +57,7 @@ public class RequestLogHandle {
         	//执行时间(秒)
         	//float requestTime = (float)(System.currentTimeMillis() - startTime.get()) / 1000;
         	long requestTime = (System.currentTimeMillis() - startTime.get());
-        	if (requestTime > 1000) {
+        	if (requestTime > requestProperties.getSlowRequestTime()) {
         		log.debug("请求消耗时间 : {} ms, 请求执行缓慢!", requestTime);
         	}
         	
@@ -62,23 +69,9 @@ public class RequestLogHandle {
     }
 
 	
-	private static String getRemoteAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
-    }
-	
 	/**
 	 * 日志打印当前请求信息
-	 * @param request
+	 * @param joinPoint 当前切面信息(包含了请求到的类、方法信息)
 	 */
 	private void printRequestInfo(JoinPoint joinPoint) {
 		
@@ -88,7 +81,7 @@ public class RequestLogHandle {
 		String requestURL = request.getRequestURL().toString();
         String url = request.getQueryString() == null ? requestURL + "" : (requestURL + "?" + request.getQueryString());
         //请求Ip
-        String ip = getRemoteAddress(request);
+        String ip = IpAddrUtil.getRemoteAddress(request);
         //请求方法类型
         String method = request.getMethod();
         //目标方法

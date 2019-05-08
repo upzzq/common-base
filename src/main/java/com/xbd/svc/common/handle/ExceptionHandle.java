@@ -6,6 +6,7 @@ import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.xbd.svc.common.utils.IpAddrUtil;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -51,19 +52,7 @@ public class ExceptionHandle {
 		return HttpResult.error(e.getCode(), e.getMessage());
 	}
 	
-	private static String getRemoteAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || ip.equalsIgnoreCase("unknown")) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
-    }
+
 	
 	/**
 	 * 日志打印当前请求信息
@@ -76,7 +65,7 @@ public class ExceptionHandle {
 		DateTimeFormatter stf = DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH时:mm分:ss秒");
 		String dateStr = stf.format(nowLocalDateTime);
 		//ip地址
-		String ip = getRemoteAddress(request);
+		String ip = IpAddrUtil.getRemoteAddress(request);
 		//请求Url
 		String requestURL = request.getRequestURL().toString();
         String url = request.getQueryString() == null ? requestURL + "" : (requestURL + "?" + request.getQueryString());
