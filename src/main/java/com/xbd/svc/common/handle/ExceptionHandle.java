@@ -3,10 +3,17 @@ package com.xbd.svc.common.handle;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import com.xbd.svc.common.utils.IpAddrUtil;
+import org.springframework.util.CollectionUtils;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -51,8 +58,43 @@ public class ExceptionHandle {
 		e.printStackTrace();
 		return HttpResult.error(e.getCode(), e.getMessage());
 	}
-	
 
+	/**
+	 * 用来处理方法里的单个/多个参数校验异常
+	 * @param ex
+	 * @return
+	 */
+	@ExceptionHandler(ConstraintViolationException.class)
+	public HttpResult resolveConstraintViolationException(ConstraintViolationException ex) {
+		Set<ConstraintViolation<?>> constraintViolations = ex.getConstraintViolations();
+		if (!CollectionUtils.isEmpty(constraintViolations)) {
+			StringBuilder msgBuilder = new StringBuilder();
+			for (ConstraintViolation constraintViolation : constraintViolations) {
+				log.info("请求参数错误: {}", constraintViolation.getMessage());
+				return HttpResult.error(1111, "参数错误");
+			}
+		}
+		return HttpResult.error(9999, "系统繁忙");
+	}
+
+	/**
+	 * 用于处理@RequestBody实体中的参数校验异常
+	 * @param ex
+	 * @return
+	 */
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public HttpResult resolveMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+		List<ObjectError> objectErrors = ex.getBindingResult().getAllErrors();
+		if (!CollectionUtils.isEmpty(objectErrors)) {
+			StringBuilder msgBuilder = new StringBuilder();
+			for (ObjectError objectError : objectErrors) {
+				//验证模式已设置为快速失败,所以拿到第一个错误就直接返回
+				log.info("请求参数错误: {}", objectError.getDefaultMessage());
+				return HttpResult.error(1111, "参数错误");
+			}
+		}
+		return HttpResult.error(9999, "系统繁忙");
+	}
 	
 	/**
 	 * 日志打印当前请求信息

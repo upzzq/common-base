@@ -22,6 +22,10 @@ import java.util.Enumeration;
 @Component
 public class RequestLogHandle {
 
+	public RequestLogHandle() {
+		System.out.println("加载请求拦截器");
+	}
+
 	@Autowired
 	private RequestProperties requestProperties;
 

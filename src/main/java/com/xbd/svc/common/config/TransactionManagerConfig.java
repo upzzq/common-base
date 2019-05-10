@@ -22,7 +22,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  * @author administrator
  *
  */
-@Configuration
+//@Configuration
 public class TransactionManagerConfig {
 	//事物超时时间,单位秒
 	//private static final int TX_METHOD_TIMEOUT = 30;
