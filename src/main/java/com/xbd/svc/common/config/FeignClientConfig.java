@@ -6,9 +6,11 @@ import org.springframework.boot.autoconfigure.web.WebMvcRegistrations;
 import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+@Configuration
 @Slf4j
 public class FeignClientConfig {
 
@@ -28,7 +30,8 @@ public class FeignClientConfig {
     }
 
     /**
-     * 不能被@FeignClient注解修饰的类才会进行解析RequestMapping
+     * 1.设置feign中的RequestMapping不能被SpringMvc加载
+     * 2.不能被@FeignClient注解修饰的类才会进行解析RequestMapping
      */
     private static class FeignRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
         @Override
