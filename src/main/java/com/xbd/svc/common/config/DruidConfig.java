@@ -1,23 +1,23 @@
 package com.xbd.svc.common.config;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+
+import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
-
-import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @Configuration
@@ -27,16 +27,18 @@ public class DruidConfig {
     @ConfigurationProperties(prefix = "spring.datasource")
     @Bean
     @ConditionalOnMissingBean(DruidDataSource.class)
-    public DataSource druid(){
+    public DataSource druidDataSource(){
         return  new DruidDataSource();
     }
 
-    //配置Druid的监控,配置一个管理后台的Servlet
+    /**
+           * 配置Druid的监控,配置一个管理后台的Servlet
+     * @return
+     */
     @Bean
-    @ConditionalOnMissingBean(name = "statViewServlet")
     public ServletRegistrationBean statViewServlet(){
         ServletRegistrationBean bean = new ServletRegistrationBean(new StatViewServlet(), "/druid/*");
-        Map<String,String> initParams = new HashMap<>();
+        Map<String,String> initParams = new HashMap<String,String>();
 
         initParams.put("loginUsername","admin");
         initParams.put("loginPassword","123456");
@@ -55,7 +57,7 @@ public class DruidConfig {
         FilterRegistrationBean bean = new FilterRegistrationBean();
         bean.setFilter(new WebStatFilter());
 
-        Map<String,String> initParams = new HashMap<>();
+        Map<String,String> initParams = new HashMap<String,String>();
         initParams.put("exclusions","*.js,*.css,/druid/*");
 
         bean.setInitParameters(initParams);

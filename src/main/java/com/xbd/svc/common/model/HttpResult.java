@@ -1,7 +1,7 @@
 package com.xbd.svc.common.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.xbd.svc.common.enums.ResultEnum;
+import com.xbd.svc.common.enums.BaseServiceExceptionEnum;
 
 import lombok.Data;
 
@@ -18,10 +18,10 @@ public class HttpResult {
 	
 	private HttpResult() {}
 
-	public static HttpResult error(ResultEnum resultEnum) {
+	public static HttpResult error(BaseServiceExceptionEnum exceptionEnum) {
 		HttpResult result = new HttpResult();
-		result.setCode(resultEnum.getCode());
-		result.setMessage(resultEnum.getMessage());
+		result.setCode(exceptionEnum.getCode());
+		result.setMessage(exceptionEnum.getMessage());
 		return result;
 	}
 	
@@ -34,15 +34,15 @@ public class HttpResult {
 	
 	public static HttpResult success() {
 		HttpResult result = new HttpResult();
-		result.setCode(ResultEnum.REQUEST_SUCCESS.getCode());
-		result.setMessage(ResultEnum.REQUEST_SUCCESS.getMessage());
+		result.setCode(BaseServiceExceptionEnum.REQUEST_SUCCESS.getCode());
+		result.setMessage(BaseServiceExceptionEnum.REQUEST_SUCCESS.getMessage());
 		return result;
 	}
 	
 	public static HttpResult success(Object data) {
 		HttpResult result = new HttpResult();
-		result.setCode(ResultEnum.REQUEST_SUCCESS.getCode());
-		result.setMessage(ResultEnum.REQUEST_SUCCESS.getMessage());
+		result.setCode(BaseServiceExceptionEnum.REQUEST_SUCCESS.getCode());
+		result.setMessage(BaseServiceExceptionEnum.REQUEST_SUCCESS.getMessage());
 		result.setData(data);
 		return result;
 	}

@@ -22,10 +22,6 @@ import java.util.Enumeration;
 @Component
 public class RequestLogHandle {
 
-	public RequestLogHandle() {
-		System.out.println("加载请求拦截器");
-	}
-
 	@Autowired
 	private RequestProperties requestProperties;
 
@@ -34,18 +30,11 @@ public class RequestLogHandle {
 	 */
 	private final String pointcut = "execution(public * com.xbd.svc.*.controller..*(..))";
 
-	/**
-	 * 单次请求超过多少时间认为该请求执行缓慢(ms)
-	 */
-	private final static int SLOW_REQUEST_TIME = 1000;
-
 
 	ThreadLocal<Long> startTime = new ThreadLocal<>();
 
 	@Pointcut(pointcut)
-	public void log() {
-		
-	}
+	public void log() {}
 	
 	@Before("log()")
 	public void doBefore(JoinPoint joinPoint) {

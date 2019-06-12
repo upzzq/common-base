@@ -3,12 +3,12 @@ package com.xbd.svc.common.config;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.aop.Advisor;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource;
@@ -33,7 +33,7 @@ public class TransactionManagerConfig {
 	private PlatformTransactionManager transactionManager;
 	
 	
-	@Bean
+	//@Bean
 	public TransactionInterceptor txAdvice() {
 		//事务管理规则，声明具备事务管理的方法名
 		NameMatchTransactionAttributeSource source = new NameMatchTransactionAttributeSource();
@@ -57,7 +57,7 @@ public class TransactionManagerConfig {
 		
 		
 		//设置方法名应用的规则
-		Map<String,TransactionAttribute> txMap = new HashMap<>();
+		Map<String,TransactionAttribute> txMap = new HashMap<String,TransactionAttribute>();
 		
 		//需要事物的方法名
 		txMap.put("add*",requireRule);
@@ -101,7 +101,7 @@ public class TransactionManagerConfig {
 		return new TransactionInterceptor(transactionManager, source);*/
 	}
 	
-	@Bean
+	//@Bean
 	public Advisor txAdviceAdvisor(){
 		//声明切点的面
 		//切面（Aspect）：切面就是通知和切入点的结合。通知和切入点共同定义了关于切面的全部内容——它的功能、在何时和何地完成其功能。
