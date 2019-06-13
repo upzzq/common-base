@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 
 @Slf4j
-public class XbdResponseEntityDecoder extends ResponseEntityDecoder {
+public class FeignResponseEntityDecoder extends ResponseEntityDecoder {
 
-    public XbdResponseEntityDecoder(Decoder decoder) {
+    public FeignResponseEntityDecoder(Decoder decoder) {
         super(decoder);
     }
 

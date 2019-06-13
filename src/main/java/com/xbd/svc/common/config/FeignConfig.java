@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xbd.svc.common.feign.support.FeignErrorDecoder;
 import com.xbd.svc.common.feign.support.FeignRequestMappingHandlerMapping;
-import com.xbd.svc.common.feign.support.XbdResponseEntityDecoder;
+import com.xbd.svc.common.feign.support.FeignResponseEntityDecoder;
+import com.xbd.svc.common.feign.support.FeignSpringFormEncoder;
 import feign.Feign;
 import feign.Logger;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
+import feign.form.spring.SpringFormEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -21,6 +23,8 @@ import org.springframework.cloud.netflix.feign.support.SpringDecoder;
 import org.springframework.cloud.netflix.feign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -76,7 +80,7 @@ public class FeignConfig {
         HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(feignObjectMapper());
         ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
         //因为重写了ResponseEntityDecoder，所以用XbdResponseEntityDecoder
-        return new XbdResponseEntityDecoder(new SpringDecoder(objectFactory));
+        return new FeignResponseEntityDecoder(new SpringDecoder(objectFactory));
     }
 
     /**
@@ -102,4 +106,15 @@ public class FeignConfig {
         return objectMapper;
     }
 
-}
+    /**
+     * 为feign增加文件上传功能
+     * @return
+     */
+    @Bean
+    @Primary
+    @Scope("prototype")
+    public Encoder multipartFormEncoder() {
+        return new FeignSpringFormEncoder();
+    }
+
+    }
