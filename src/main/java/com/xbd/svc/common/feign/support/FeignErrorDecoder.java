@@ -10,7 +10,7 @@ import feign.Response;
 import feign.Util;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
@@ -27,29 +27,29 @@ public class FeignErrorDecoder implements ErrorDecoder {
             //解析接口返回结果
             String errorRequestUrl = response.request().url();
             String errorContent = Util.toString(response.body().asReader());
-            log.error("远程服务处理失败,请求url:\r\n{}\r\n{}" , errorRequestUrl , errorContent);
+            log.error("远程服务处理失败,\r\nmethodKey: {}\r\n响应结果: {}\r\n请求url: {}" , methodKey, errorContent, errorRequestUrl);
             if (StringUtils.isNotBlank(errorContent)) {
-                if (response.status() != HttpStatus.OK.value()) {
-
-                    JSONObject errorMsg = JSON.parseObject(errorContent);
-                    int code = errorMsg.getInteger("code");
-                    String message = errorMsg.getString("message");
-
-                    //基础服务抛出的请求异常不触发 hystrix 的熔断机制
-                    if (400 <= response.status() && response.status() < 500) {
-                        return new HystrixBadRequestException("errorDecode: request error", new RemoteServiceException(BaseServiceExceptionEnum.REMOTE_SERVICE_ERROR));
-                    }
-
-                    //status 503 是统一异常处理抛出的微服务调用异常(异常传递)
-                    if (response.status() == HttpStatus.SERVICE_UNAVAILABLE.value()) {
-                        return new RemoteServiceException(code, message);
-                    }
+                // 基础服务返回的 httpstatus 为 400 - 499 不触发 hystrix 的熔断机制
+                if (HttpStatus.BAD_REQUEST.value() >= response.status() && response.status() < HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+                    return new HystrixBadRequestException("errorDecode: request error", new RemoteServiceException(BaseServiceExceptionEnum.REMOTE_SERVICE_ERROR));
                 }
+
+                JSONObject errorMsg = JSON.parseObject(errorContent);
+                Integer code = errorMsg.getInteger("code");
+                String message = errorMsg.getString("message");
+
+                if (code == null || message == null) {
+                    // 未知错误信息
+                    return new BaseServiceException(BaseServiceExceptionEnum.SYS_ERROR);
+                }
+                return new RemoteServiceException(code, message);
+            } else {
+                // 无错误信息
+                return new BaseServiceException(BaseServiceExceptionEnum.SYS_ERROR);
             }
-            return new BaseServiceException(BaseServiceExceptionEnum.SYS_ERROR);
+
         } catch (IOException e) {
-            log.error("errorDecode httpStatus 503 response 解析错误");
-            e.printStackTrace();
+            log.error("errorDecode httpStatus response 解析错误", e);
             return new BaseServiceException(BaseServiceExceptionEnum.SYS_ERROR);
         }
     }

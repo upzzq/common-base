@@ -2,7 +2,6 @@ package com.xbd.svc.common.exception;
 
 import com.xbd.svc.common.enums.BaseServiceExceptionEnum;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 public class BaseServiceException extends RuntimeException {

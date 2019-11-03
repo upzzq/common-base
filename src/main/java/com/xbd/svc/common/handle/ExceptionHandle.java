@@ -1,6 +1,5 @@
 package com.xbd.svc.common.handle;
 
-import com.alibaba.fastjson.JSONObject;
 import com.xbd.svc.common.enums.BaseServiceExceptionEnum;
 import com.xbd.svc.common.exception.BaseServiceException;
 import com.xbd.svc.common.exception.RemoteServiceException;
@@ -12,15 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
@@ -40,6 +36,7 @@ public class ExceptionHandle {
 	 * @return
 	 */
 	@ExceptionHandler(Exception.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public HttpResult exceptionHandle(HttpServletRequest request, Exception e) {
 		//系统中未知异常
 		log.error("【系统异常出错】============================================================");
@@ -57,6 +54,7 @@ public class ExceptionHandle {
 	 * @return
 	 */
 	@ExceptionHandler(BaseServiceException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public HttpResult exceptionHandle(HttpServletRequest request, BaseServiceException e) {
 		log.error("【系统异常出错】============================================================");
 		//打印当前请求信息
@@ -73,7 +71,7 @@ public class ExceptionHandle {
 	 * @return
 	 */
 	@ExceptionHandler(RemoteServiceException.class)
-	@ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public HttpResult exceptionHandle(HttpServletRequest request, RemoteServiceException e) {
 		log.error("【系统异常出错】============================================================");
 		//打印当前请求信息
@@ -90,15 +88,15 @@ public class ExceptionHandle {
 	 * @return
 	 */
 	@ExceptionHandler(RemoteServiceUnknownException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public HttpResult exceptionHandle(HttpServletRequest request, RemoteServiceUnknownException e) {
 		log.error("【系统异常出错】============================================================");
 		//打印当前请求信息
 		printErrorRequestInfo(request);
 		//对内只打印错误信息
 		e.printStackTrace();
-		BaseServiceExceptionEnum sysErrorEnum = BaseServiceExceptionEnum.SYS_ERROR;
 		//对外转换为统一异常
-		return HttpResult.error(sysErrorEnum.getCode(), sysErrorEnum.getMessage());
+		return HttpResult.error(BaseServiceExceptionEnum.REMOTE_SERVICE_EXCEPTION);
 	}
 
 	/**

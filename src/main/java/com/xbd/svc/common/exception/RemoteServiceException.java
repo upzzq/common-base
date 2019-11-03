@@ -1,7 +1,6 @@
 package com.xbd.svc.common.exception;
 
 import com.xbd.svc.common.enums.BaseServiceExceptionEnum;
-import lombok.Data;
 
 /**
  * 内部微服务捕获的异常

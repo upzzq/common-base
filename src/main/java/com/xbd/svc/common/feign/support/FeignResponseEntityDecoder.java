@@ -7,7 +7,7 @@ import feign.FeignException;
 import feign.Response;
 import feign.codec.Decoder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.netflix.feign.support.ResponseEntityDecoder;
+import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 
 import java.io.IOException;
 import java.lang.reflect.Type;

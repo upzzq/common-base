@@ -1,31 +1,3 @@
-#spring:
-#  datasource:
-#    username: root
-#    password: 123456
-#    url: jdbc:mysql://127.0.0.1:3306/ap?characterEncoding=utf-8&useSSL=false
-#    driver-class-name: com.mysql.jdbc.Driver
-#    type: com.alibaba.druid.pool.DruidDataSource
-#    initialSize: 5
-#    minIdle: 5
-#    maxActive: 20
-#    maxWait: 60000
-#    timeBetweenEvictionRunsMillis: 60000
-#    minEvictableIdleTimeMillis: 300000
-#    validationQuery: SELECT 'x'
-#    testWhileIdle: true
-#    testOnBorrow: false
-#    testOnReturn: false
-#    # 如果用Oracle，则把poolPreparedStatements配置为true，mysql可以配置为false。分库分表较多的数据库，建议配置为false。removeabandoned不建议在生产环境中打开如果用SQL Server，建议追加配置)
-#    poolPreparedStatements: false
-#    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
-#    filters: stat,wall,log4j
-#    maxPoolPreparedStatementPerConnectionSize: 20
-#    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
-#    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
-#    # 合并多个DruidDataSource的监控数据
-#    useGlobalDataSourceStat: true
-#
-#
 spring:
   redis:
     # Redis服务器地址
@@ -47,3 +19,10 @@ spring:
       max-idle: 10
       # 连接池中的最小空闲连接
       min-idle: 2
+
+xbd:
+  worker:
+    # 第几台机器，可以按照一定规则顺序设置
+    workerId: 1
+    # 第几个数据中心, 可以按照一定规则顺序设置
+    datacenterId: 1
